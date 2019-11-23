@@ -8,12 +8,38 @@ import {
   Alert
 } from 'react-native';
 import {Agenda} from 'react-native-calendars';
+import { addTodo, removeTodo } from './src/actions'
 
+import { connect } from 'react-redux'
+
+// const goToAbout = (updateItem, tempDate, items) => {
+//   Actions.about(updateItem, tempDate, items)
+// }
 const goToAbout = () => {
   Actions.about()
 }
 
-export default class Home extends Component {
+const initialState = {
+  height: '',
+  name: ''
+}
+
+class Home extends Component {
+
+  state = initialState
+  
+  updateInput = (key, value) => {
+    this.setState({
+      ...this.state,
+      [key]: value
+    })
+  }
+
+  addTodo = () => {
+    this.props.dispatchAddTodo(this.state)
+    this.setState(initialState)
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -32,9 +58,23 @@ export default class Home extends Component {
         ]
       },
       data: [],
-      tempDate: ''
+      tempDate: '2017-06-14'
     };
   }
+
+  // updateAuto(tempDate) {
+  //   const popTodo = this.props.todos.pop()
+  //   this.state.items[tempDate].push(popTodo)
+  //   tempItems = this.state.items
+  //   this.updateItem(tempItems)
+  // }
+
+  // static getDerivedStateFromProps(nextProps, prevState) {
+  //   if (prevState.data !== nextProps.todos) {
+  //     return updateAuto(this.state.tempDate)
+  //   }
+  //   return null;
+  //   }
 
   updateDate(temp) {
     this.setState(
@@ -42,7 +82,15 @@ export default class Home extends Component {
     )
   }
 
+  updateItem(tempItems) {
+    this.setState(
+        this.state.items = tempItems
+    )
+  }
+
   render() {
+    const { todos } = this.props
+
     return (
       <Agenda
         items={this.state.items}
@@ -87,12 +135,18 @@ export default class Home extends Component {
   onDayPress(day) {
     const temp = day.dateString
     this.updateDate(temp)
+    const popTodo = this.props.todos.pop()
+    this.state.items[temp].push(popTodo)
+    tempItems = this.state.items
+    this.updateItem(tempItems)
+    // this.updateItem(tempItems)
+    // console.log(this.state.items)
   }
 
   renderItem(item) {
     // console.log(item)
     return (
-      <View style={[styles.item, {height: item.height}]}>
+      <View style={styles.item}>
         <Text>{item.name}</Text>
         <Button
           title="Update item"
@@ -141,3 +195,14 @@ const styles = StyleSheet.create({
     paddingTop: 30
   }
 });
+
+const mapDispatchToProps = {
+  dispatchAddBook: (book) => addBook(book),
+  // dispatchRemoveBook: (book) => removeBook(book)
+}
+
+const mapStateToProps = (state) => ({
+  todos: state.todoReducer.todos
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home)
